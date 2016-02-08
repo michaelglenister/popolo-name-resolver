@@ -1,29 +1,25 @@
 from setuptools import setup, find_packages
-import os
-
-file_dir = os.path.abspath(os.path.dirname(__file__))
-
-def read_file(filename):
-    filepath = os.path.join(file_dir, filename)
-    return open(filepath).read()
-
-def install_requires():
-    reqs = read_file('requirements.txt')
-    reqs = reqs.splitlines()
-    reqs = [ x for x in reqs if x and x[0] != '#' and x[0:2] != '-e' ]
-    return reqs
 
 setup(
-    name="popit-resolver",
-    version='0.1',
-    description='Resolve names to popit-django records',
-    long_description=read_file('README.md'),
+    name="popolo-name-resolver",
+    version='0.2',
+    description='Resolve names to people in Popolo data',
+    long_description='',
     author='mySociety',
     author_email='hakim@mysociety.org',
-    url='https://github.com/mysociety/popit-resolver',
+    url='https://github.com/mysociety/popolo-name-resolver',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=install_requires(),
+    install_requires=[
+        'mysociety-django-popolo == 0.0.2',
+        'django-model-utils == 2.3.1',
+        'django-haystack >= 2, < 3',
+        'PyYAML',
+        'django-nose',
+        'South',
+        'psycopg2',
+        'elasticsearch == 0.4.5',
+    ],
     classifiers=[
         'Framework :: Django',
     ],

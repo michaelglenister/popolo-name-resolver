@@ -38,7 +38,7 @@ if 'test' in sys.argv:
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
+        'URL': '127.0.0.1:9200',
         'INDEX_NAME': index_name,
     },
 }
@@ -126,10 +126,10 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'popit_resolver.urls'
+ROOT_URLCONF = 'project.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'popit_resolver.wsgi.application'
+WSGI_APPLICATION = 'project.wsgi.application'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -139,6 +139,18 @@ TEMPLATE_DIRS = (
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
+# The SOUTH_TESTS_MIGRATE = False is to work around an annoying
+# problem: when running the tests, South is used to create the
+# database tables; South runs syncdb, but with a reduced
+# INSTALLED_APPS that doesn't include popolo_name_resolver; the end of
+# the syncdb emits a signal that Haystack catches, and that's when
+# Haystack finds and loads all the search_indexes modules. Since
+# popolo_name_resolver isn't in INSTALLED_APPS via that code path,
+# it's missed and the search index for EntityName isn't found within
+# the tests.  The easiest way to work around this problem seems to be
+# to not use South when running tests.
+SOUTH_TESTS_MIGRATE = False
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -146,11 +158,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_nose',
     'south',
     'haystack',
-    'popit',
-    'popit_resolver',
+    'popolo',
+    'popolo_name_resolver',
+    'django_nose',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

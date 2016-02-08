@@ -1,6 +1,7 @@
 import datetime
 from haystack import indexes
-from popit_resolver.models import EntityName
+from popolo_name_resolver.models import EntityName
+
 
 class EntityNameIndex(indexes.SearchIndex, indexes.Indexable):
 

@@ -9,3 +9,4 @@ chromedriver.log
 .noseids
 *.swp
 *.swo
+/popolo_name_resolver.egg-info
