@@ -10,6 +10,13 @@ from popolo_name_resolver.resolve import (
 from unittest import TestCase
 
 
+class ExcludePeopleWithNoMiddleNames(object):
+
+    def is_person_allowed(self, person):
+        name_parts = person.name.split()
+        return len(name_parts) > 2
+
+
 class ResolvePopitNameTest(TestCase):
 
     @classmethod
@@ -40,3 +47,12 @@ class ResolvePopitNameTest(TestCase):
 
         popolo_person = resolver.get_person('J Q Smith')
         self.assertEqual(self.john_q, popolo_person)
+
+    def test_resolve_with_filter(self):
+        resolver = ResolvePopoloName(
+            date=datetime.date(month=11, year=2010, day=1),
+            person_filter=ExcludePeopleWithNoMiddleNames(),
+        )
+
+        popolo_person = resolver.get_person('John Smith')
+        self.assertEqual(popolo_person.name, 'John Quentin Smith')

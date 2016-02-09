@@ -18,7 +18,8 @@ class ResolvePopoloName (object):
 
     def __init__(self,
             date = None,
-            date_string = None):
+            date_string = None,
+            person_filter = None):
 
         if date_string:
             date = datetime.strptime(date_string, '%Y-%m-%d')
@@ -27,6 +28,7 @@ class ResolvePopoloName (object):
 
         self.date = date
         self.person_cache = {}
+        self.person_filter = person_filter
 
     def get_person(self, name, party=None):
 
@@ -53,17 +55,11 @@ class ResolvePopoloName (object):
                 results = [r for r in results if not re.search('Deputy', r.object.name)]
 
             if len(results):
-
-                result = results[0]
-                obj = result.object
-
-                # print >> sys.stderr, "SCORE %s" % str( result.score )
-
-                if not obj:
-                    print >> sys.stderr, "Unexpected error: are you reusing main Elasticsearch index for tests?"
-                    return None
-
-                return obj.person
+                for result in results:
+                    person = result.object.person
+                    if (self.person_filter is None or
+                        self.person_filter.is_person_allowed(person)):
+                        return person
 
         # This should ensure that we only try name variants until one
         # actually returns something:
