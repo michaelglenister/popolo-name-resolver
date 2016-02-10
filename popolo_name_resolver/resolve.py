@@ -189,76 +189,84 @@ def recreate_entities(verbose=False):
     done = 0
 
     for person in Person.objects.all():
-        name = person.name
-        if not name:
-            continue
-
-        def make_name(**kwargs):
-            kwargs['person'] = person
-            kwargs['start_date'] = kwargs.get('start_date') or date(year=2000, month=1, day=1)
-            kwargs['end_date'] = kwargs.get('end_date') or date(year=2030, month=1, day=1)
-            return EntityName.objects.get_or_create(**kwargs)
-
-        possible_initials = _get_possible_initials(person)
-        family_name = _get_family_name(person)
-        honorifics = set([person.honorific_prefix, ''])
-
-        def concat_name(names):
-            return ' '.join(n for n in names if n)
-
-        possible_names = set()
-
-        for honorific in honorifics:
-            full_name = concat_name( [honorific, name] )
-            possible_names.add(full_name)
-            for initials in possible_initials:
-                name_with_initials = concat_name( [honorific, initials, family_name] )
-                possible_names.add(name_with_initials)
-
-        for possible_name in possible_names:
-            make_name(name=possible_name)
-
-        # Now this script also creates names which include the
-        # organization name too:
-
-        for membership in person.memberships.all():
-            if not membership.organization:
+        try:
+            name = person.name
+            if not name:
                 continue
-            organization = membership.organization
-            organization_names = set([organization.name])
-            for other_name in organization.other_names.all():
-                organization_names.add(other_name.name)
-            start_date, end_date = _dates(membership)
 
-            classification = organization.classification.lower()
+            def make_name(**kwargs):
+                kwargs['person'] = person
+                kwargs['start_date'] = kwargs.get('start_date') or date(year=2000, month=1, day=1)
+                kwargs['end_date'] = kwargs.get('end_date') or date(year=2030, month=1, day=1)
+                return EntityName.objects.get_or_create(**kwargs)
 
-            if classification == 'party':
-                for n in possible_names:
-                    for organization_name in organization_names:
-                        for p in get_party_name_variants(organization['name']):
-                            name_with_party = '%s (%s)' % (n, p)
-                            make_name(
-                                name=name_with_party,
-                                start_date=start_date,
-                                end_date=end_date)
+            possible_initials = _get_possible_initials(person)
+            family_name = _get_family_name(person)
+            honorifics = set([person.honorific_prefix, ''])
 
-            role = membership.role
-            label = membership.label
+            def concat_name(names):
+                return ' '.join(n for n in names if n)
 
-            party_mship = (classification == 'party' and role == 'Member')
-            candidate_list_mship = re.search(r'^\d+.* Candidate$', role)
+            possible_names = set()
 
-            if not (party_mship or candidate_list_mship):
-                # FIXME: I suspect we could drop this completely
-                # with very few problems, but haven't tested that.
-                for membership_label in (role, label):
-                    if not membership_label:
-                        continue
+            for honorific in honorifics:
+                full_name = concat_name( [honorific, name] )
+                possible_names.add(full_name)
+                for initials in possible_initials:
+                    name_with_initials = concat_name( [honorific, initials, family_name] )
+                    possible_names.add(name_with_initials)
 
-                    make_name(
-                        name=' '.join( [membership_label, organization_name] ),
-                        start_date=start_date,
-                        end_date=end_date)
+            for possible_name in possible_names:
+                make_name(name=possible_name)
+
+            # Now this script also creates names which include the
+            # organization name too:
+
+            for membership in person.memberships.all():
+                if not membership.organization:
+                    continue
+                organization = membership.organization
+                organization_names = set([organization.name])
+                for other_name in organization.other_names.all():
+                    organization_names.add(other_name.name)
+                start_date, end_date = _dates(membership)
+
+                classification = organization.classification.lower()
+
+                if classification == 'party':
+                    for n in possible_names:
+                        for organization_name in organization_names:
+                            for p in get_party_name_variants(organization['name']):
+                                name_with_party = '%s (%s)' % (n, p)
+                                make_name(
+                                    name=name_with_party,
+                                    start_date=start_date,
+                                    end_date=end_date)
+
+                role = membership.role
+                label = membership.label
+
+                party_mship = (classification == 'party' and role == 'Member')
+                candidate_list_mship = re.search(r'^\d+.* Candidate$', role)
+
+                if not (party_mship or candidate_list_mship):
+                    # FIXME: I suspect we could drop this completely
+                    # with very few problems, but haven't tested that.
+                    for membership_label in (role, label):
+                        if not membership_label:
+                            continue
+
+                        make_name(
+                            name=' '.join( [membership_label, organization_name] ),
+                            start_date=start_date,
+                            end_date=end_date)
+        except Exception:
+            # If there was any error, it's helpful to see which person
+            # the update failed for before re-raising the exception:
+            print "Failed when creating EntityName objects for {person} with ID {person_id}".format(
+                person=person, person_id=person.id
+            )
+            raise
 
         done += 1
 
