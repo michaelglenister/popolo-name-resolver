@@ -2,7 +2,7 @@ import datetime
 import json
 import sys
 
-from popolo.models import Person
+from popolo import models
 from popolo_name_resolver.resolve import (
     delete_entities, recreate_entities, ResolvePopoloName
 )
@@ -23,13 +23,13 @@ class ResolvePopitNameTest(TestCase):
     def setUpClass(cls):
         super(ResolvePopitNameTest, cls).setUpClass()
         # Create some Popolo people:
-        cls.john_q = Person.objects.create(
+        cls.john_q = models.Person.objects.create(
             name='John Quentin Smith',
         )
-        Person.objects.create(
+        models.Person.objects.create(
             name='John Smith',
         )
-        cls.pele = Person.objects.create(
+        cls.pele = models.Person.objects.create(
             name='Pele',
         )
         # And create lots of EntityName objects for looking them up.
@@ -38,7 +38,7 @@ class ResolvePopitNameTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         delete_entities()
-        Person.objects.all().delete()
+        models.Person.objects.all().delete()
 
     def test_aaa(self):
         self.assertTrue(True) # dummy pass, to prevent annoying stacktrace of SQL DDL if first test fails
