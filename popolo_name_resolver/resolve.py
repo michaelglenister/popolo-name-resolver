@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 name_stopwords = re.compile(
     '^(Adv|Chief|Dr|Miss|Mme|Mna|Mnr|Mnu|Moh|Moruti|Moulana|Mr|Mrs|Ms|Njing|Nkk|Nksz|Nom|P|Prince|Prof|Rev|Rre|Umntwana) ')
 
+
+def tidy_name(s):
+    if not s:
+        return s
+    return re.sub(r'(?ms)\s+', ' ', s).strip()
+
+
 class ResolvePopoloName (object):
 
     def __init__(self,
@@ -126,8 +133,11 @@ def _get_possible_initials(person):
 
     result = set()
 
-    given_names = person.given_name.split()
-    first_names = person.name.split()[:-1]
+    given_name = tidy_name(person.given_name)
+    person_name = tidy_name(person.name)
+
+    given_names = given_name.split()
+    first_names = person_name.split()[:-1]
 
     for names in (given_names, first_names):
         if not names:
@@ -150,15 +160,17 @@ def _get_possible_initials(person):
 
 def _get_family_name(person):
 
-    if person.family_name:
-        return person.family_name
-
-    given_name = person.given_name
-    if given_name and person.name.startswith(given_name):
-        family_name = person.name.replace(given_name, '', 1).strip()
+    family_name = tidy_name(person.family_name)
+    if family_name:
         return family_name
 
-    return person.name.rsplit(' ', 1)[1]
+    given_name = tidy_name(person.given_name)
+    person_name = tidy_name(person.name)
+    if given_name and person_name.startswith(given_name):
+        family_name = person_name.replace(given_name, '', 1).strip()
+        return family_name
+
+    return person_name.rsplit(' ', 1)[1]
 
 def _dates(membership):
     def get_date(field):
@@ -190,7 +202,7 @@ def recreate_entities(verbose=False):
 
     for person in Person.objects.all():
         try:
-            name = person.name
+            name = tidy_name(person.name)
             if not name:
                 continue
 
@@ -210,6 +222,7 @@ def recreate_entities(verbose=False):
             possible_names = set()
 
             for honorific in honorifics:
+                honorific = tidy_name(honorific)
                 full_name = concat_name( [honorific, name] )
                 possible_names.add(full_name)
                 for initials in possible_initials:
@@ -226,9 +239,10 @@ def recreate_entities(verbose=False):
                 if not membership.organization:
                     continue
                 organization = membership.organization
-                organization_names = set([organization.name])
+                organization_name = tidy_name(organization.name)
+                organization_names = set([organization_name])
                 for other_name in organization.other_names.all():
-                    organization_names.add(other_name.name)
+                    organization_names.add(tidy_name(other_name.name))
                 start_date, end_date = _dates(membership)
 
                 classification = organization.classification.lower()
@@ -253,6 +267,7 @@ def recreate_entities(verbose=False):
                     # FIXME: I suspect we could drop this completely
                     # with very few problems, but haven't tested that.
                     for membership_label in (role, label):
+                        membership_label = tidy_name(membership_label)
                         if not membership_label:
                             continue
 
