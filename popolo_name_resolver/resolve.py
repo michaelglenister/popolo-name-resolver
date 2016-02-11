@@ -249,8 +249,8 @@ def recreate_entities(verbose=False):
 
                 if classification == 'party':
                     for n in possible_names:
-                        for organization_name in organization_names:
-                            for p in get_party_name_variants(organization['name']):
+                        for o_name in organization_names:
+                            for p in get_party_name_variants(o_name):
                                 name_with_party = '%s (%s)' % (n, p)
                                 make_name(
                                     name=name_with_party,
