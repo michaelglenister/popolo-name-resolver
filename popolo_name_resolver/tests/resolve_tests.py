@@ -29,6 +29,9 @@ class ResolvePopitNameTest(TestCase):
         Person.objects.create(
             name='John Smith',
         )
+        cls.pele = Person.objects.create(
+            name='Pele',
+        )
         # And create lots of EntityName objects for looking them up.
         recreate_entities(verbose=False)
 

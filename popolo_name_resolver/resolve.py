@@ -170,7 +170,7 @@ def _get_family_name(person):
         family_name = person_name.replace(given_name, '', 1).strip()
         return family_name
 
-    return person_name.rsplit(' ', 1)[1]
+    return person_name.rsplit(' ', 1)[-1]
 
 def _dates(membership):
     def get_date(field):
