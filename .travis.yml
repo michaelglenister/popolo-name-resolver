@@ -1,0 +1,34 @@
+notifications:
+  email: false
+  irc:
+    channels:
+      - "irc.mysociety.org#build"
+    use_notice: true
+    skip_join: true
+
+services:
+  - elasticsearch
+
+language: python
+python:
+  - '2.7'
+  - '3.4'
+# We can re-enable this once we're up to Django 1.8
+#  - '3.5'
+addons:
+  postgresql: "9.1"
+
+install:
+  - pip install Django==1.6.5
+  - pip install -e .
+  - sed -r
+    -e "s,(POPIT_RESOLVER_DB_USER:) .*,\\1 'postgres',"
+    -e "s,(POPIT_RESOLVER_DB_NAME:) .*,\\1 'travis-test',"
+    -e "s,(SECRET_KEY:) '',\\1 'notatallsecret',"
+    conf/general.yml-example > conf/general.yml
+
+before_script:
+  - createdb -U postgres travis-test
+
+script:
+  - ./manage.py test
