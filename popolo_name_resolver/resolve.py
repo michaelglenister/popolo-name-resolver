@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from datetime import datetime, date
 import logging
 import sys
@@ -278,13 +280,13 @@ def recreate_entities(verbose=False):
         except Exception:
             # If there was any error, it's helpful to see which person
             # the update failed for before re-raising the exception:
-            print "Failed when creating EntityName objects for {person} with ID {person_id}".format(
+            print("Failed when creating EntityName objects for {person} with ID {person_id}".format(
                 person=person, person_id=person.id
-            )
+            ))
             raise
 
         done += 1
 
         if verbose:
             message = "Done {0} out of {1} people ({2}%)"
-            print message.format(done, total_people, (done * 100) / total_people)
+            print(message.format(done, total_people, (done * 100) / total_people))
