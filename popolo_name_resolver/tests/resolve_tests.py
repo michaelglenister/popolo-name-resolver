@@ -1,6 +1,4 @@
 import datetime
-import json
-import sys
 
 from haystack.query import SearchQuerySet
 
