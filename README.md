@@ -1,5 +1,5 @@
-popit-name-resolver
-===================
+popolo-name-resolver
+====================
 
 A Django application to help resolve names to people in Popolo data
 
