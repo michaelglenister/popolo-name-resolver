@@ -19,7 +19,7 @@ addons:
   postgresql: "9.1"
 
 install:
-  - pip install Django==1.6.5
+  - pip install Django==1.7.11
   - pip install -e .
   - sed -r
     -e "s,(POPIT_RESOLVER_DB_USER:) .*,\\1 'postgres',"

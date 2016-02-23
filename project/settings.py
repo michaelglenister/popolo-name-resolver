@@ -139,18 +139,6 @@ TEMPLATE_DIRS = (
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-# The SOUTH_TESTS_MIGRATE = False is to work around an annoying
-# problem: when running the tests, South is used to create the
-# database tables; South runs syncdb, but with a reduced
-# INSTALLED_APPS that doesn't include popolo_name_resolver; the end of
-# the syncdb emits a signal that Haystack catches, and that's when
-# Haystack finds and loads all the search_indexes modules. Since
-# popolo_name_resolver isn't in INSTALLED_APPS via that code path,
-# it's missed and the search index for EntityName isn't found within
-# the tests.  The easiest way to work around this problem seems to be
-# to not use South when running tests.
-SOUTH_TESTS_MIGRATE = False
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -158,7 +146,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'south',
     'haystack',
     'popolo',
     'popolo_name_resolver',
