@@ -11,6 +11,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
+        'Django >= 1.8',
         'mysociety-django-popolo == 0.0.5',
         'django-model-utils == 2.3.1',
         'django-haystack >= 2, < 3',
