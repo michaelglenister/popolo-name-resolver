@@ -16,7 +16,6 @@ setup(
         'django-haystack >= 2, < 3',
         'PyYAML',
         'django-nose',
-        'South',
         'psycopg2',
         'elasticsearch == 0.4.5',
     ],
