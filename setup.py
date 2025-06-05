@@ -18,7 +18,7 @@ setup(
         'PyYAML',
         'django-nose',
         'psycopg2',
-        'elasticsearch == 0.4.5',
+        'elasticsearch >= 0.4.5',
     ],
     classifiers=[
         'Framework :: Django',
