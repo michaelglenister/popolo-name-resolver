@@ -14,7 +14,7 @@ setup(
         'Django >= 1.8',
         'mysociety-django-popolo >= 0.0.5',
         'django-model-utils >= 2.3.1',
-        'django-haystack >= 2, < 3',
+        'django-haystack >= 2',
         'PyYAML',
         'django-nose',
         'psycopg2',
